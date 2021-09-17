@@ -1,0 +1,50 @@
+{% extends "auctions/layout.html" %}
+{% block title %}
+    Auction
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="my-4">Active Listings</h2>
+        {% for listing in activelistings %}
+        <div class="row">
+            <div class="col-sm-4 border rounded-left bg-light p-4">
+                <img src="{{ listing.image }}" class="img-thumbnail" alt="image">
+            </div>
+            <div class="col-sm-8 border rounded-right bg-light py-4 px-5">
+                <h2><a href="{%url  'ListPage' listing.pk%}">{{ listing.title }}</a></h2>
+                <ul>
+                    <li>{{ listing.desc}}</li>
+                </ul>
+                <p class="lead">Category : {{ listing.categories }}</p>
+                <h6>Starting Bid : ${{ listing.startingbid }}</h6>
+                <br><br>
+                 <p class="text-muted">Created at : {{ listing.created_at }}</p>
+            </div>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+    <hr class="mt-4">
+    <div class="container">
+        <h2 class="my-4">Closed Listings</h2>
+        {% for listing in closedlistings %}
+        <div class="row">
+            <div class="col-sm-4 border border-danger rounded-left bg-light p-4">
+                <img src="{{ listing.image }}" class="img-thumbnail" alt="image">
+            </div>
+            <div class="col-sm-8 border border-danger rounded-right bg-light py-4 px-5">
+                <h2><a href="{%url  'ListPage' listing.pk%}">{{ listing.title }}</a></h2>
+                <ul>
+                    <li>{{ listing.desc }}</li>
+                </ul>
+                <p class="lead">Category : {{ listing.categories }}</p>
+                <h6>Starting Bid : ${{ listing.startingbid }}</h6>
+                <br><br>
+                 <p class="text-muted">Created at : {{ listing.created_at }}</p>
+            </div>
+        </div>
+        <br>
+        {% endfor %}      
+    </div>
+{% endblock %}
