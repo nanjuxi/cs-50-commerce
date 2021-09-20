@@ -3,8 +3,10 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from .models import User, AuctionList
-from .forms import NewAuction
+from .models import *
+from .forms import *
+from django.contrib.auth.decorators import login_required
+from django.db.models import Max
 
 
 def index(request):
@@ -73,6 +75,7 @@ def add(request):
         "NewAuction": NewAuction(),
     })
 
+@login_required
 def CreateList(request):
     if request.method == "POST":
         form = NewAuction(request.POST)
@@ -85,11 +88,40 @@ def CreateList(request):
 def ListPage(request, listing_id):
     if request.user.is_authenticated:
         auction = AuctionList.objects.get(pk=listing_id)
+        currentuser = UserList.objects.filter(auctionlist_id = auction, user_id = request.user)
+        check = WatchList.objects.filter(auctionlist_id=auction, user_id=request.user)
+        winner = False
+        if request.user == auction.winner:
+            winner = True
         return render(request, "auctions/ListPage.html", {
             "auction": auction,
+            "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+            "check": check,
+            "form": BidForm(),
+            "close": currentuser,
+            "winner": winner,
+            "commentform": CommentForm(),
+            "comments": Comments.objects.filter(auctions_id=auction)
         })
     else:
-        return render(request, "auctions/index.html")
+        auction = AuctionList.objects.get(pk = listing_id)
+        currentbid = Bid.objects.filter(auctionlist_id = auction)
+        if currentbid:
+            bid = currentbid.aggregate(Max('bid'))
+            return render(request, "auctions/ListPage.html", {
+                "listing": AuctionList.objects.get(pk=listing_id),
+                "currentbid": bid,
+                "commentform": CommentForm(),
+                "comments": Comments.objects.filter(auctionlist_id=auction),
+            })
+        else:
+            return render(request, "auctions/ListPage.html", {
+                "listing": AuctionList.objects.get(pk=listing_id),
+                "currentbid": None,
+                "commentform": CommentForm(),
+                "comments": Comments.objects.filter(auctionlist_id=auction)
+            })
+
 
 
 

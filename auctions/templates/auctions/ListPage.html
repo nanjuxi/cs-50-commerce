@@ -1,13 +1,18 @@
 {% extends "auctions/layout.html" %}
 
 {% block title %}
-
+Auction | {{listing.title}}
 {% endblock %}
 
 
 {% block body %}
 <div class="container">
         <h2 class="my-4">ListPage</h2>
+        <div>
+            {% if winner %}
+            You won!
+            {% endif %}
+        </div>
         <div class="row">
             <div class="col-sm-4 border rounded-left bg-light p-4">
                 <img src="{{ auction.image }}" class="img-thumbnail" alt="image">
@@ -19,10 +24,44 @@
                 </ul>
                 <p class="lead">Category : {{ auction.categories }}</p>
                 <h6>Starting Bid : ${{ auction.startingbid }}</h6>
+                {% if currentbid.bid__max %}
+                <h6><span class="badge-success">Current highest bid</span>:{{currentbid.bid__max}}</h6>
+                {% else %}
+                   <span class="badge badge-danger">No available bid</span>
+                {% endif %}
                 <br><br>
                  <p class="text-muted">Created at : {{ auction.created_at }}</p>
             </div>
+
+            {% if user.is_authenticated %}
+                {% if auction.closed %}
+                    <span class="badge badge-danger">Auction Closed!</span>
+                {% else %}
+                    {% if not check %}
+                        <form action="" method="post">
+                            {% csrf_token %}
+                             <input type="submit" value="Add to watchlist">
+                        </form>
+                    {% else %}
+                         <form action=""   method="post">
+                             <input type="submit"  value="remove from watchlist">
+                         </form>
+                    {% endif %}
+                {% endif %}
+            <br><br>
+                    {% if auction.closed %}
+                        {% else %}
+                           <form action="" method="post">
+                               {% csrf_token %}
+                               {{ form.place_bid.errors}}
+                               {{form.place_bid}}
+                               <br>
+                               <input type="submit" value="Place Bid">
+                           </form>
+                    {% endif %}
+            {% endif %}
         </div>
         <br>
+
 </div>
 {% endblock %}
