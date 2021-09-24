@@ -101,7 +101,7 @@ def ListPage(request, listing_id):
             "close": currentuser,
             "winner": winner,
             "commentform": CommentForm(),
-            "comments": Comments.objects.filter(auctions_id=auction)
+            "comments": Comments.objects.filter(auctionslist_id=auction)
         })
     else:
         auction = AuctionList.objects.get(pk = listing_id)
@@ -112,17 +112,26 @@ def ListPage(request, listing_id):
                 "listing": AuctionList.objects.get(pk=listing_id),
                 "currentbid": bid,
                 "commentform": CommentForm(),
-                "comments": Comments.objects.filter(auctionlist_id=auction),
+                "comments": Comments.objects.filter(auctionslist_id=auction),
             })
         else:
             return render(request, "auctions/ListPage.html", {
                 "listing": AuctionList.objects.get(pk=listing_id),
                 "currentbid": None,
                 "commentform": CommentForm(),
-                "comments": Comments.objects.filter(auctionlist_id=auction)
+                "comments": Comments.objects.filter(auctionslist_id=auction)
             })
 
 
+def addwatchlist(request, listing_id):
+    print("1")
+    if request.method == "POST":
+        watch = WatchList(user_id=1, auctionlist_id=listing_id)
+        watch.save()
+        print("2")
+        return(render, "auctions/ListPage.html", {
+        })
+    print("3")
 
 
 
